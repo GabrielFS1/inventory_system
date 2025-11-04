@@ -1,0 +1,91 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+  --primary: #ef7b1d;
+  --input-bg: #f3f4f6;
+  --input-border: #d1d5db;
+  --input-text: #111827;
+  --message-bg: #e5e7eb;
+  --message-text: #111827;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+    --primary: #bc6016;
+    --input-bg: #1f1f1f;
+    --input-border: #374151;
+    --input-text: #f3f4f6;
+    --message-bg: #1f2937;
+    --message-text: #f3f4f6;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 1rem;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+  max-height: 60vh;
+  overflow-y: auto;
+  width: 100%;
+  max-width: 500px;
+  margin-bottom: 1rem;
+}
+
+li {
+  background: var(--message-bg);
+  color: var(--message-text);
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  margin-bottom: 0.5rem;
+  word-break: break-word;
+}
+
+form {
+  display: flex;
+  gap: 0.5rem;
+  width: 100%;
+  max-width: 500px;
+}
+
+input {
+  flex: 1;
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--input-border);
+  border-radius: 0.5rem;
+  background: var(--input-bg);
+  color: var(--input-text);
+}
+
+input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(239, 123, 29, 0.3);
+}
+
+button {
+  padding: 0.5rem 1rem;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+button:hover {
+  background: #ef7b1d;
+}
