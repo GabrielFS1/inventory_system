@@ -2,7 +2,7 @@ import express from 'express';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 import knexLib from 'knex';
-import config from './knexfile.js';
+import config from '../knexfile.js';
 
 const knex = knexLib(config.development);
 
