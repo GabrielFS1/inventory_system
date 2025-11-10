@@ -1,54 +1,71 @@
 'use client';
-
 import { useEffect, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
 
-type Message = string;
+type Scan = {
+  barcode: string;
+  description: string;
+  time_readed: string;
+};
 
 const socket: Socket = io('http://localhost:3001');
 
 export default function Home() {
-  const [input, setInput] = useState('');
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [barcode, setBarcode] = useState('');
+  const [description, setDescription] = useState('');
+  const [scans, setScans] = useState<Scan[]>([]);
 
   useEffect(() => {
-    socket.on('connect', () => {
-      console.log('Conectado ao servidor socket!');
+    socket.on('load scans', (dbScans: Scan[]) => {
+      setScans(dbScans);
     });
 
-    socket.on('chat message', (msg: Message) => {
-      setMessages(prev => [...prev, msg]);
+    socket.on('new scan', (scan: Scan) => {
+      setScans(prev => [...prev, scan]);
     });
 
     return () => {
-      socket.off('connect');
-      socket.off('chat message');
+      socket.off('load scans');
+      socket.off('new scan');
     };
   }, []);
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (input) {
-      socket.emit('chat message', input);
-      setInput('');
-    }
+    if (!barcode || !description) return;
+    socket.emit('scan event', { barcode, description });
+    setBarcode('');
+    setDescription('');
   };
 
   return (
-    <div>
-      <ul>
-        {messages.map((msg, idx) => (
-          <li key={idx}>{msg}</li>
-        ))}
-      </ul>
+    <div style={{ padding: 20 }}>
+      <h1>📦 Inventory System</h1>
+
       <form onSubmit={handleSubmit}>
         <input
-          type="text"
-          value={input}
-          onChange={e => setInput(e.target.value)}
+          placeholder="Barcode"
+          value={barcode}
+          onChange={e => setBarcode(e.target.value)}
+          required
         />
-        <button type="submit">Enviar</button>
+        <input
+          placeholder="Description"
+          value={description}
+          onChange={e => setDescription(e.target.value)}
+          required
+        />
+        <button type="submit">Add Scan</button>
       </form>
+
+      <ul>
+        {scans.map((s, i) => (
+          <li key={i}>
+            <b>{s.barcode}</b> — {s.description} <br />
+            <small>{new Date(s.time_readed).toLocaleString()}</small>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }

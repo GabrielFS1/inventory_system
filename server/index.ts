@@ -1,38 +1,41 @@
 import express from 'express';
 import { createServer } from 'http';
-import { Server, Socket } from 'socket.io';
+import { Server } from 'socket.io';
+import knexLib from 'knex';
+import config from './knexfile.js';
 
-const port = process.env.SOCKET_PORT || 3001;
+const knex = knexLib(config.development);
 
 const app = express();
-const httpServer = createServer(app);
-
-const io = new Server(httpServer, {
-  cors: {
-    origin: "http://localhost:3000",
-    methods: ["GET", "POST"]
-  }
+const server = createServer(app);
+const io = new Server(server, {
+  cors: { origin: '*' }
 });
 
-app.post('/api/teste', express.json(), (req, res) => {
-  const { message } = req.body;
-  io.emit('chat message', message);
-  res.json({ status: 'Mensagem enviada', message });
-});
+io.on('connection', socket => {
+  console.log('✅ Client connected:', socket.id);
 
-io.on('connection', (socket: Socket) => {
-  console.log(`Usuário conectado no socket: ${socket.id}`);
+  // Send all existing scans to the new client
+  knex('scans').select('*').then(scans => {
+    socket.emit('load scans', scans);
+  });
 
-  socket.on('chat message', (msg: string) => {
-    console.log('Mensagem:', msg);
-    io.emit('chat message', msg);
+  // When receiving a new scan
+  socket.on('scan event', async (data: { barcode: string; description: string }) => {
+    const { barcode, description } = data;
+    const time_readed = new Date().toISOString();
+
+    // Save in DB
+    await knex('scans').insert({ barcode, description, time_readed });
+
+    // Send to all clients
+    io.emit('new scan', { barcode, description, time_readed });
   });
 
   socket.on('disconnect', () => {
-    console.log(`Usuário desconectou: ${socket.id}`);
+    console.log('❌ Client disconnected:', socket.id);
   });
 });
 
-httpServer.listen(port, () => {
-  console.log(`Servidor Socket.IO/Express rodando em http://localhost:${port}`);
-});
+const PORT = process.env.PORT || 3001;
+server.listen(PORT, () => console.log(`🚀 Server running on http://localhost:${PORT}`));
