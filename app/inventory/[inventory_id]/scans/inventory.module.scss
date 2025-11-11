@@ -1,0 +1,38 @@
+.inventoryContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 72px;
+  width: 100%;
+  padding: 0 1rem;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.form {
+  display: flex;
+  gap: 0.5rem;
+  width: 100%;
+  max-width: 500px;
+  margin-bottom: 1.5rem;
+}
+
+.scanList {
+  width: 100%;
+  max-width: 500px;
+}
+
+.scanItem {
+  background: var(--message-bg);
+  color: var(--message-text);
+  transition: background 0.2s ease;
+
+  &:hover {
+    background: rgba(239, 123, 29, 0.15);
+  }
+}
