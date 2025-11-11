@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Inventory } from './type/types';
 import styles from './page.module.scss';
 
-const socket = io('https://kitten-fond-bluejay.ngrok-free.app3001');
+const socket = io('https://kitten-fond-bluejay.ngrok-free.app');
 
 export default function HomePage() {
   const [inventories, setInventories] = useState<Inventory[]>([]);
