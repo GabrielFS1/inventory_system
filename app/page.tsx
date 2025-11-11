@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Inventory } from './type/types';
 import styles from './page.module.scss';
 
-const socket = io('http://localhost:3001');
+const socket = io('https://kitten-fond-bluejay.ngrok-free.app3001');
 
 export default function HomePage() {
   const [inventories, setInventories] = useState<Inventory[]>([]);
@@ -14,8 +14,8 @@ export default function HomePage() {
   const router = useRouter();
 
   useEffect(() => {
-    fetch('http://localhost:3001/inventories')
-      .then(res => res.json())
+    fetch('https://kitten-fond-bluejay.ngrok-free.app/inventories')
+        .then(res => res.json())
       .then(setInventories);
 
     socket.on('new inventory', (inv: Inventory) =>

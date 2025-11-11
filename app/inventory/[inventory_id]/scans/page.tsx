@@ -5,7 +5,7 @@ import { useParams } from 'next/navigation';
 import { Inventory, Scan } from '../../../type/types'
 import styles from './inventory.module.scss';
 
-const socket = io('http://localhost:3001');
+const socket = io('https://kitten-fond-bluejay.ngrok-free.app');
 
 export default function InventoryItemsPage() {
   const { inventory_id } = useParams();
@@ -15,7 +15,7 @@ export default function InventoryItemsPage() {
   const [description, setDescription] = useState('');
 
   useEffect(() => {
-    fetch(`http://localhost:3001/inventories/${inventory_id}`)
+    fetch(`https://kitten-fond-bluejay.ngrok-free.app/inventories/${inventory_id}`)
       .then(res => res.json())
       .then(setInventory);
   }, []);
@@ -26,7 +26,7 @@ export default function InventoryItemsPage() {
     socket.emit('join inventory', Number(inventory_id));
 
     socket.on('load scans', (dbScans: Scan[]) => setScans(dbScans));
-    socket.on('new scan', (scan: Scan) => setScans(prev => [...prev, scan]));
+    socket.on('new scan', (scan: Scan) => setScans(prev => [scan, ...prev]));
 
     return () => {
       socket.off('load scans');
@@ -59,7 +59,7 @@ export default function InventoryItemsPage() {
           value={barcode}
           onChange={e => setBarcode(e.target.value)}
         />
-        <input
+        <input 
           placeholder="Description"
           value={description}
           onChange={e => setDescription(e.target.value)}
