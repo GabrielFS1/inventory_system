@@ -1,68 +1,64 @@
-'use client';
+'use client'
 import { useEffect, useState } from 'react';
-import { io, Socket } from 'socket.io-client';
+import { io } from 'socket.io-client';
+import { useRouter } from 'next/navigation';
+import { Inventory } from './type/types';
+import styles from './page.module.scss';
 
-type Scan = {
-  barcode: string;
-  description: string;
-  time_readed: string;
-};
+const socket = io('http://localhost:3001');
 
-const socket: Socket = io('http://localhost:3001');
-
-export default function Home() {
-  const [barcode, setBarcode] = useState('');
-  const [description, setDescription] = useState('');
-  const [scans, setScans] = useState<Scan[]>([]);
+export default function HomePage() {
+  const [inventories, setInventories] = useState<Inventory[]>([]);
+  const [name, setName] = useState('');
+  const [code, setCode] = useState('');
+  const router = useRouter();
 
   useEffect(() => {
-    socket.on('load scans', (dbScans: Scan[]) => {
-      setScans(dbScans);
-    });
+    fetch('http://localhost:3001/inventories')
+      .then(res => res.json())
+      .then(setInventories);
 
-    socket.on('new scan', (scan: Scan) => {
-      setScans(prev => [...prev, scan]);
-    });
+    socket.on('new inventory', (inv: Inventory) =>
+      setInventories(prev => [inv, ...prev])
+    );
 
     return () => {
-      socket.off('load scans');
-      socket.off('new scan');
+      socket.off('new inventory')
     };
   }, []);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!barcode || !description) return;
-    socket.emit('scan event', { barcode, description });
-    setBarcode('');
-    setDescription('');
+  const createInventory = () => {
+    socket.emit('create inventory', { name, code });
+    setName('');
+    setCode('');
   };
 
   return (
-    <div style={{ padding: 20 }}>
-      <h1>📦 Inventory System</h1>
+    <div className={styles.pageContainer}>
+      <h1 className={styles.title}>Inventários</h1>
 
-      <form onSubmit={handleSubmit}>
+      <div className={styles.formSection}>
         <input
-          placeholder="Barcode"
-          value={barcode}
-          onChange={e => setBarcode(e.target.value)}
-          required
+          placeholder="Nome do inventário"
+          value={name}
+          onChange={e => setName(e.target.value)}
         />
         <input
-          placeholder="Description"
-          value={description}
-          onChange={e => setDescription(e.target.value)}
-          required
+          placeholder="Código do inventário"
+          value={code}
+          onChange={e => setCode(e.target.value)}
         />
-        <button type="submit">Add Scan</button>
-      </form>
+        <button onClick={createInventory}>Criar</button>
+      </div>
 
-      <ul>
-        {scans.map((s, i) => (
-          <li key={i}>
-            <b>{s.barcode}</b> — {s.description} <br />
-            <small>{new Date(s.time_readed).toLocaleString()}</small>
+      <ul className={styles.inventoryList}>
+        {inventories.map(inv => (
+          <li
+            key={inv.id}
+            className={styles.inventoryItem}
+            onClick={() => router.push(`/inventory/${inv.id}/scans`)}
+          >
+            <b>{inv.name}</b> — {inv.code}
           </li>
         ))}
       </ul>
