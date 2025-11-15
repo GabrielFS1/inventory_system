@@ -1,0 +1,23 @@
+.navBar {
+  position: absolute;
+  max-width: 1200px;
+  width: 100%;
+  padding: 12px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.logoText {
+  font-size: 1.4rem;
+}
+
+.buttonsNavBar {
+  font-size: 1.2rem;
+  display: flex;
+  gap: 22px;
+}
+
+.buttonsNavBar div:hover {
+  color: var(--primary);
+  cursor: pointer;
+}
